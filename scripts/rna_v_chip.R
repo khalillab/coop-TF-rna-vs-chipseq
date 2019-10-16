@@ -1,5 +1,6 @@
 library(tidyverse)
 library(ggrepel)
+library(ggpmisc)
 
 main = function(
     input_path = "chip_ZF-cumulative-peaklist-v-rna_verified_genes_plus_Venus_low-affinity-ZF-v-high-affinity-ZF.tsv",
@@ -21,24 +22,6 @@ main = function(
         geom_hline(yintercept=0, color="grey70", size=0.2) +
         geom_vline(xintercept=0, color="grey70", size=0.2) +
         geom_abline(slope=1, intercept=0, color="grey70", size=0.2) +
-        geom_point(data = df %>%
-                       filter(!(rna_significant | chip_significant)),
-                   color="grey50",
-                   alpha=0.5,
-                   shape=16,
-                   size=0.8) +
-        geom_label_repel(aes(color=(rna_significant | chip_significant),
-                             label=ifelse(rna_significant | chip_significant,
-                                          rna_name,
-                                          NA)),
-                         min.segment.length=0,
-                         point.padding=0,
-                         box.padding=0,
-                         label.padding=unit(0.5, "pt"),
-                         label.size=NA,
-                         fill="#FFFFFF80",
-                         size=2,
-                         fontface="italic") +
         geom_rug(sides="b",
                  aes(color=chip_significant),
                  alpha=0.5,
@@ -47,14 +30,35 @@ main = function(
                  aes(color=rna_significant),
                  alpha=0.5,
                  size=0.2) +
+        geom_point(aes(color=(rna_significant | chip_significant)),
+                   alpha=0.5,
+                   shape=16,
+                   size=0.8) +
+        stat_dens2d_filter(aes(color=(rna_significant | chip_significant),
+                               label=ifelse(rna_significant | chip_significant,
+                                          rna_name,
+                                          NA)),
+                           geom="label_repel",
+                           keep.number=20,
+                           h=0.5,
+                           n=500,
+                         min.segment.length=0,
+                         point.padding=0,
+                         box.padding=0,
+                         label.padding=0,
+                         force=0.1,
+                         label.size=NA,
+                         fill="#FFFFFF80",
+                         size=2,
+                         fontface="italic") +
         theme(legend.position="none") +
-        scale_x_continuous(name=bquote(.(factor) *
-                                           " ChIP enrichment, log"["2"] ~
+        scale_x_continuous(name=bquote(.(factor) ~
+                                           "ChIP enrichment, log"[2] ~
                                            textstyle(frac(.(condition_id),
                                                 .(control_id)))),
                            breaks=scales::pretty_breaks(4)) +
         scale_y_continuous(name=bquote(atop("RNA-seq,",
-                                            "log"["2"] ~
+                                            "log"[2] ~
                                                 textstyle(frac(.(condition_id),
                                                 .(control_id))))),
                            breaks=scales::pretty_breaks(4)) +
@@ -82,4 +86,3 @@ main(input_path = snakemake@input[["table"]],
      rna_fdr = snakemake@params[["rna_fdr"]],
      chip_fdr = snakemake@params[["chip_fdr"]],
      output_path = snakemake@output[["svg"]])
-
