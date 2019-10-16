@@ -1,0 +1,5 @@
+.snakemake/
+chip_matched_to_rna/
+config.yaml
+mogrify.log
+
