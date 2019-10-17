@@ -29,8 +29,8 @@ onsuccess:
 rule target:
     input:
         "config.yaml",
-        expand(expand("chip_matched_to_rna/chip_{{chip_annotation}}-v-rna_{{rna_annotation}}/chip_{{chip_annotation}}-v-rna_{{rna_annotation}}_{condition}-v-{control}.tsv", zip, condition=CONDITIONS, control=CONTROLS), chip_annotation=CHIP_ANNOTATIONS, rna_annotation=RNA_ANNOTATIONS),
-        expand(expand("chip_matched_to_rna/chip_{{chip_annotation}}-v-rna_{{rna_annotation}}/chip_{{chip_annotation}}-v-rna_{{rna_annotation}}_{condition}-v-{control}.svg", zip, condition=CONDITIONS, control=CONTROLS), chip_annotation=CHIP_ANNOTATIONS, rna_annotation=RNA_ANNOTATIONS)
+        expand(expand("chip_matched_to_rna/chip_{{chip_annotation}}-v-rna_{{rna_annotation}}/{condition}-v-{control}/chip_{{chip_annotation}}-v-rna_{{rna_annotation}}_{condition}-v-{control}.tsv", zip, condition=CONDITIONS, control=CONTROLS), chip_annotation=CHIP_ANNOTATIONS, rna_annotation=RNA_ANNOTATIONS),
+        expand(expand("chip_matched_to_rna/chip_{{chip_annotation}}-v-rna_{{rna_annotation}}/{condition}-v-{control}/chip_{{chip_annotation}}-v-rna_{{rna_annotation}}_{condition}-v-{control}.svg", zip, condition=CONDITIONS, control=CONTROLS), chip_annotation=CHIP_ANNOTATIONS, rna_annotation=RNA_ANNOTATIONS)
 
 rule match_chip_to_rna:
     input:
@@ -38,8 +38,8 @@ rule match_chip_to_rna:
         chip_results = chip_pipe(f"diff_binding/{{chip_annotation}}/{{condition}}-v-{{control}}/libsizenorm/{{condition}}-v-{{control}}_{FACTOR}-chipseq-libsizenorm-{{chip_annotation}}-diffbind-results-all.tsv"),
         fasta = config["genome"]["fasta"]
     output:
-        temp = temp("chip_matched_to_rna/chip_{chip_annotation}-v-rna_{rna_annotation}/.chip_{chip_annotation}-v-rna_{rna_annotation}_{condition}-v-{control}.temp"),
-        table = "chip_matched_to_rna/chip_{chip_annotation}-v-rna_{rna_annotation}/chip_{chip_annotation}-v-rna_{rna_annotation}_{condition}-v-{control}.tsv"
+        temp = temp("chip_matched_to_rna/chip_{chip_annotation}-v-rna_{rna_annotation}/{condition}-v-{control}/.chip_{chip_annotation}-v-rna_{rna_annotation}_{condition}-v-{control}.temp"),
+        table = "chip_matched_to_rna/chip_{chip_annotation}-v-rna_{rna_annotation}/{condition}-v-{control}/chip_{chip_annotation}-v-rna_{rna_annotation}_{condition}-v-{control}.tsv"
     params:
         upstream = config["search_distance"]["upstream"],
         downstream = config["search_distance"]["downstream"]
@@ -59,9 +59,9 @@ rule match_chip_to_rna:
 
 rule datavis:
     input:
-        table = "chip_matched_to_rna/chip_{chip_annotation}-v-rna_{rna_annotation}/chip_{chip_annotation}-v-rna_{rna_annotation}_{condition}-v-{control}.tsv"
+        table = "chip_matched_to_rna/chip_{chip_annotation}-v-rna_{rna_annotation}/{condition}-v-{control}/chip_{chip_annotation}-v-rna_{rna_annotation}_{condition}-v-{control}.tsv"
     output:
-        svg = "chip_matched_to_rna/chip_{chip_annotation}-v-rna_{rna_annotation}/chip_{chip_annotation}-v-rna_{rna_annotation}_{condition}-v-{control}.svg"
+        svg = "chip_matched_to_rna/chip_{chip_annotation}-v-rna_{rna_annotation}/{condition}-v-{control}/chip_{chip_annotation}-v-rna_{rna_annotation}_{condition}-v-{control}.svg"
     params:
         factor = config["factor"],
         rna_fdr = config["differential_expression"]["fdr"],
