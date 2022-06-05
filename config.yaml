@@ -1,0 +1,15 @@
+---
+
+rnaseq_workflow: ../rnaseq/
+chip_workflow: ../chipseq-5/
+
+comparisons:
+    libsizenorm:
+        - high-affinity-ZF: reporter-only
+        - low-affinity-ZF: high-affinity-ZF
+        - low-affinity-ZF-with-clamp: high-affinity-ZF
+        - low-affinity-ZF-with-clamp: low-affinity-ZF
+
+search_distance:
+    upstream: 200
+    downstream: 100
